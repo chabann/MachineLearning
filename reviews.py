@@ -1,5 +1,4 @@
 import requests
-import telebot
 import urllib.parse as urlencoder
 from bs4 import BeautifulSoup
 from desctop_agents import get_header
@@ -25,30 +24,33 @@ class Reviews:
         soup = BeautifulSoup(result.text, 'html.parser')  # Отправляем полученную страницу в библиотеку для парсинга
 
         search_results = soup.find('ul', {'class': 'search_results'})  # скорее всего вы ищете
-        items = search_results.find_all('li')
+        if search_results is None:
+            print('По данному запросу результатов не найдено')
+        else:
+            items = search_results.find_all('li')
 
-        for item in items:
-            title_block = item.find('h3', {'class': 'product_title'})
-            title_link = title_block.find('a')
+            for item in items:
+                title_block = item.find('h3', {'class': 'product_title'})
+                title_link = title_block.find('a')
 
-            if title_link is not None:
-                self.name = title_link.text.lstrip().rstrip()  # удаляет лишние пробелы в начале и конце
-                print(self.name)
+                if title_link is not None:
+                    self.name = title_link.text.lstrip().rstrip()  # удаляет лишние пробелы в начале и конце
+                    print(self.name)
 
-                self.link = title_link.attrs['href']
-                print(self.link)
+                    self.link = title_link.attrs['href']
+                    print(self.link)
 
-            main_stats = item.find('div', {'class': 'main_stats'})
-            date = main_stats.find('p')
-            if date is not None:
-                print(date.text.lstrip().rstrip())
+                main_stats = item.find('div', {'class': 'main_stats'})
+                date = main_stats.find('p')
+                if date is not None:
+                    print(date.text.lstrip().rstrip())
 
-            desc = item.find('p', {'class': ['deck', 'basic_stat']})
-            if desc is not None:
-                print(desc.text)
+                desc = item.find('p', {'class': ['deck', 'basic_stat']})
+                if desc is not None:
+                    print(desc.text)
 
-            print('          ')
-            print('          ')
+                print('          ')
+                print('          ')
 
     def get_reviews(self):
         url_search_detail = self.urlDetailReviews.replace('#NAME_LINK#', self.link)
@@ -78,4 +80,4 @@ class Reviews:
                     print('                 -----------------------                       ')
 
 
-#Test = Reviews('The godfather')
+Test = Reviews('Tenet')
