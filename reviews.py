@@ -1,4 +1,5 @@
 import requests
+import telebot
 import urllib.parse as urlencoder
 from bs4 import BeautifulSoup
 from desctop_agents import get_header
@@ -77,4 +78,4 @@ class Reviews:
                     print('                 -----------------------                       ')
 
 
-Test = Reviews('The godfather')
+#Test = Reviews('The godfather')
