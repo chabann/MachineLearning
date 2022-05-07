@@ -51,10 +51,15 @@ class Reviews:
 
             return result_items
 
-    def get_reviews(self, link):
+    def get_reviews_info(self, link):
         url_search_detail = self.urlDetailReviews.replace('#NAME_LINK#', link)
         result = requests.get(url_search_detail, headers=get_header())  # отправляем HTTP запрос
         soup = BeautifulSoup(result.text, 'html.parser')  # Отправляем полученную страницу в библиотеку для парсинга
+
+        main_info = soup.find('table', {'class': 'simple_summary'})
+        score = main_info.find('span', {'class': 'metascore_w'})
+        if score is not None:
+            score = score.text
 
         reviews_main_block = soup.find('div', {'class': 'reviews'})  # скорее всего вы ищете
         if reviews_main_block is None:
@@ -70,10 +75,8 @@ class Reviews:
 
                 author_link = author_block.find('a')
                 if author_link is not None:
-                    print('author: ', author_link.text)
                     current_review['author'] = author_link.text
                 else:
-                    print('author: ', author_block.text)
                     current_review['author'] = author_block.text
 
                 message_block = comment.find('span', {'class': 'blurb_expanded'})
@@ -86,4 +89,4 @@ class Reviews:
 
                 return_reviews.append(current_review)
 
-        return return_reviews
+        return {'arReviews': return_reviews, 'averageScore': score}
