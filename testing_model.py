@@ -1,9 +1,6 @@
 import pickle
 import pandas as pd
 import numpy as np
-# from data_preparing import unique, rmse_error, r2_error
-from sklearn import preprocessing
-from sklearn.metrics import accuracy_score
 
 
 def preprocess_score(val):
@@ -37,19 +34,10 @@ df = pd.read_csv('datasets/testdata.csv', encoding='latin-1', sep=',', error_bad
 
 df['score'] = df.apply(lambda row: preprocess_score(row['score']), axis=1)
 
-"""class_names = unique(df['score'])
-le = preprocessing.LabelEncoder()
-le.fit(class_names)"""
-
 X_test = df['text'].tolist()
 y_test = df['score'].tolist()
 
-# predicted_proba = model.predict_proba(X_test)
-# predicted = le.inverse_transform(predicted)
-
 predicted = model.predict(X_test)
-# predicted = le.inverse_transform(predicted)
-# print('Accuracy score on test data is ', round(accuracy_score(df['score'], predicted), 2))
 
 pr_val = []
 for x in predicted:
