@@ -79,6 +79,16 @@ class Reviews:
                 else:
                     current_review['author'] = author_block.text
 
+                score_block = comment.find('span', {'class': 'metascore_w'})
+                if score_block is not None:
+                    current_review['score'] = score_block.text
+                else:
+                    score_block = comment.find('div', {'class': 'metascore_w'})
+                    if score_block is not None:
+                        current_review['score'] = score_block.text
+                    else:
+                        current_review['score'] = 0
+
                 message_block = comment.find('span', {'class': 'blurb_expanded'})
                 if message_block is not None:
                     current_review['text'] = message_block.text
