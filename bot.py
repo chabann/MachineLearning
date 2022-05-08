@@ -10,18 +10,24 @@ bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id, 'Привет, введи название фильма!')
+    bot.send_message(message.chat.id, 'Привет, введи название фильма!', reply_markup=types.ReplyKeyboardRemove())
 
 
 @bot.message_handler(commands=['stop'])
 def stop(message):
-    bot.send_message(message.chat.id, 'Поиск окончен', reply_markup=types.ReplyKeyboardRemove())
+    startKBoard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    Start = types.KeyboardButton(text='Старт')
+    startKBoard.add(Start)
+
+    bot.send_message(message.chat.id, 'Поиск окончен', reply_markup=startKBoard)
 
 
 @bot.message_handler(func=lambda message: message.text != '')
 def search_film(message):
     if message.text == 'Завершить':
         stop(message)
+    elif message.text == 'Старт':
+        start(message)
     else:
         ar_films = Reviews(message.text).process_search()
 
@@ -41,7 +47,8 @@ def search_film(message):
             sent = bot.send_message(message.chat.id, answer)
             bot.register_next_step_handler(sent, print_film, {'films': ar_films, 'i': 1})
 
-            bot.send_message(message.chat.id, 'Это единственный найденный фильм по данному запросу, нажми кнопку Выбрать, '
+            bot.send_message(message.chat.id, 'Это единственный найденный фильм по данному запросу, нажми кнопку '
+                                              'Выбрать, '
                                               'чтобы получить по нему отзывы либо перефразируй запрос',
                              reply_markup=startKBoard)
         else:
@@ -59,6 +66,10 @@ def search_film(message):
 
 
 def print_film(message, films):
+    startKBoard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    Stop = types.KeyboardButton(text='Завершить')
+    startKBoard.add(Stop)
+
     if message.text == 'Дальше':
         if films['i'] < len(films['films']):
             film = films['films'][films['i']]
@@ -69,30 +80,35 @@ def print_film(message, films):
                 bot.register_next_step_handler(sent, print_film, {'films': films['films'], 'i': films['i'] + 1})
             else:
                 bot.send_message(message.chat.id, 'Это все найденные фильмы, пожалуйста, перефразируй запрос',
-                                 reply_markup=types.ReplyKeyboardRemove())
+                                 reply_markup=startKBoard)
         else:
-            bot.send_message(message.chat.id, 'Больше найденных фильмов нет',
-                             reply_markup=types.ReplyKeyboardRemove())
+            bot.send_message(message.chat.id, 'Больше найденных фильмов нет', reply_markup=startKBoard)
+
     elif message.text == 'Выбрать':
         film = films['films'][films['i'] - 1]
         answer = film['name'] + '. ' + film['date']
 
-        startKBoard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
-        Stop = types.KeyboardButton(text='Завершить')
-        startKBoard.add(Stop)
-
-        bot.send_message(message.chat.id, 'Выбранный фильм: ' + answer, reply_markup=startKBoard)
+        bot.send_message(message.chat.id, 'Выбранный фильм: ' + answer, reply_markup=types.ReplyKeyboardRemove())
 
         reviews_info = Reviews(film['name']).get_reviews_info(film['link'])
         ar_reviews = reviews_info['arReviews']
         if not ar_reviews:
-            bot.send_message(message.chat.id, 'Данный фильм не содержит отзывов, выбери другой')
+            bot.send_message(message.chat.id, 'Данный фильм не содержит отзывов, выбери другой',
+                             reply_markup=startKBoard)
         else:
-            bot.send_message(message.chat.id, 'У данного фильма ' + str(len(ar_reviews)) + ' отзывов')
+            if len(ar_reviews) % 10 == 1:
+                mess_count = 'У данного фильма ' + str(len(ar_reviews)) + ' отзыв'
+            elif (len(ar_reviews) % 10 == 2) or (len(ar_reviews) % 10 == 3) or (len(ar_reviews) % 10 == 4):
+                mess_count = 'У данного фильма ' + str(len(ar_reviews)) + ' отзыва'
+            else:
+                mess_count = 'У данного фильма ' + str(len(ar_reviews)) + ' отзывов'
+
+            bot.send_message(message.chat.id, mess_count)
             bot.send_message(message.chat.id, 'Оценка фильма зрителями на Metacritic: ' +
                              str(reviews_info['averageScore']))
             bot.send_message(message.chat.id, get_prediction(ar_reviews))
-            bot.send_message(message.chat.id, 'Введи название следующего фильма или нажми Завершить')
+            bot.send_message(message.chat.id, 'Введи название следующего фильма или нажми Завершить',
+                             reply_markup=startKBoard)
 
     elif message.text == 'Завершить':
         stop(message)
