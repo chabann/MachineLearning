@@ -1,6 +1,7 @@
 import spacy
 import numpy as np
 import os
+from scoring import Scoring
 
 
 def get_score_model(data_directory='datasets/aclImdb/test'):
@@ -8,7 +9,14 @@ def get_score_model(data_directory='datasets/aclImdb/test'):
     count_test = 0
     score_sum = 0
 
+    labels = []
+    given_answers = []
+
     for label in ['pos', 'neg']:
+        label_class = 1
+        if label == 'neg':
+            label_class = 0
+
         labeled_directory = f"{data_directory}/{label}"
         for review in os.listdir(labeled_directory):
             if review.endswith('.txt'):
@@ -21,8 +29,18 @@ def get_score_model(data_directory='datasets/aclImdb/test'):
                             ((parsed_text.cats['pos'] > parsed_text.cats['neg']) and (label == 'neg')):
                         score_sum += 1
                     count_test += 1
+                    labels.append(label_class)
+                    given_answers.append(parsed_text.cats['pos'])
+
     rmse = np.sqrt(score_sum / count_test)
     print('Ошибка RMSE для тестовой выборки ', rmse)
+
+    scoring = Scoring(given_answers, labels, True)
+
+    print('Precision', scoring.precision())
+    print('Accuracy', scoring.accuracy())
+    print('Recall', scoring.recall())
+    print('F1-score', scoring.f1_score())
 
 
 def get_prediction(input_data):
@@ -45,7 +63,13 @@ if __name__ == "__main__":
     texts = ['So beautiful!!', 'terrible movie, just disgusting ((', 'I cant believe it was shown in a movie',
              'this movie is a piece of shit', 'I think it can be interesting, but im not sure..']
 
-    for text in texts:
-        get_prediction(text)
+    # for text in texts:
+        # get_prediction(text)
 
     get_score_model()
+
+    """Ошибка RMSE для тестовой выборки 0.4374014174645528
+    Precision 0.8200729322061993
+    Accuracy 0.80896
+    Recall 0.7916
+    F1 - score 0.8055849548155987"""
