@@ -70,6 +70,11 @@ def print_film(message, films):
     Stop = types.KeyboardButton(text='Завершить')
     startKBoard.add(Stop)
 
+    startKBoardLast = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    Stop = types.KeyboardButton(text='Завершить')
+    Choose = types.KeyboardButton(text='Выбрать')
+    startKBoardLast.add(Choose, Stop)
+
     if message.text == 'Дальше':
         if films['i'] < len(films['films']):
             film = films['films'][films['i']]
@@ -79,10 +84,12 @@ def print_film(message, films):
             if films['i'] + 1 < len(films['films']):
                 bot.register_next_step_handler(sent, print_film, {'films': films['films'], 'i': films['i'] + 1})
             else:
-                bot.send_message(message.chat.id, 'Это все найденные фильмы, пожалуйста, перефразируй запрос',
-                                 reply_markup=startKBoard)
+                bot.register_next_step_handler(sent, print_film, {'films': films['films'], 'i': films['i'] + 1})
+                bot.send_message(message.chat.id, 'Это последний из найденных фильмов',
+                                 reply_markup=startKBoardLast)
         else:
-            bot.send_message(message.chat.id, 'Больше найденных фильмов нет', reply_markup=startKBoard)
+            bot.send_message(message.chat.id, 'Это все найденные фильмы, пожалуйста, перефразируй запрос',
+                             reply_markup=startKBoard)
 
     elif message.text == 'Выбрать':
         film = films['films'][films['i'] - 1]

@@ -116,9 +116,14 @@ class Reviews:
                         else:
                             message_block = comment.find('div', {'class': 'review_body'})
                             message_block = message_block.find('span')
-                            current_review['text'] = message_block.text
 
-                        return_reviews.append(current_review)
+                            if 'text' in current_review:
+                                current_review['text'] = message_block.text
+                            else:
+                                current_review['text'] = None
+
+                        if current_review['text'] is not None:
+                            return_reviews.append(current_review)
 
                 page += 1
                 url_search_detail_page = url_search_detail + '?page=' + str(page)
