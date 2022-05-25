@@ -2,6 +2,7 @@ import spacy
 import numpy as np
 import os
 from scoring import Scoring
+from sklearn.metrics import roc_auc_score
 
 
 def get_score_model(data_directory='datasets/aclImdb/test'):
@@ -41,6 +42,7 @@ def get_score_model(data_directory='datasets/aclImdb/test'):
     print('Accuracy', scoring.accuracy())
     print('Recall', scoring.recall())
     print('F1-score', scoring.f1_score())
+    print('AUC-score', roc_auc_score(given_answers, labels))
 
 
 def get_prediction(input_data):
@@ -73,3 +75,12 @@ if __name__ == "__main__":
     Accuracy 0.80896
     Recall 0.7916
     F1 - score 0.8055849548155987"""
+
+    """
+    Ошибка RMSE для тестовой выборки  0.4374014174645528
+    Precision 0.8200729322061993
+    Accuracy 0.80896
+    Recall 0.7916
+    F1-score 0.8055849548155987
+    AUC-score 0.8093328941222739
+    """
