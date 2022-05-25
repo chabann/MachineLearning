@@ -51,7 +51,7 @@ def train_model(training_data, test_data, iterations=20):
         optimizer = nlp.begin_training()
         # Итерация обучения
         print("Loss\t\tPrec.\tRec.\tF-score")
-        batch_sizes = compounding(4.0, 32.0, 1.001)  # Генератор бесконечной последовательности входных чисел
+        batch_sizes = compounding(4.0, 32.0, 1.001)
 
         for i in range(iterations):
             loss = {}
