@@ -77,13 +77,14 @@ def print_film(message, films):
     startKBoardLast.add(Choose, Stop)
 
     if message.text == 'Назад':
-        if (films['i'] - 1 >= 0) > len(films['films']):
+        print(films['i'] - 1, len(films['films']))
+        if films['i'] - 1 > -1:
             film = films['films'][films['i'] - 1]
             answer = film['name'] + '. ' + film['date'] + '. ' + film['description']
             sent = bot.send_message(message.chat.id, answer)
-            bot.register_next_step_handler(sent, print_film, {'films': films['films'], 'i': films['i'] -1})
+            bot.register_next_step_handler(sent, print_film, {'films': films['films'], 'i': films['i'] - 1})
         else:
-            bot.send_message(message.chat.id, 'Это первый найденый фильм в списке')
+            bot.send_message(message.chat.id, 'Это первый найденый фильм в списке', reply_markup=startKBoardLast)
 
     elif message.text == 'Дальше':
         if films['i'] < len(films['films']):
