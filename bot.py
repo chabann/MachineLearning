@@ -3,8 +3,8 @@ from telebot import types
 from reviews import Reviews
 from predict_mood import get_prediction
 
-# f = open('token.txt', 'r')
-token = '5317294884:AAHOidQIMVi9GE2MSi5PB0MbgMl8ddNFaJE'
+f = open('token.txt', 'r')
+token = f.read()
 bot = telebot.TeleBot(token)
 
 ##старт бота##
@@ -64,7 +64,7 @@ def search_film(message):
             message.text = 'Дальше'
             print_film(message, {'films': ar_films, 'i': 0})
 
-##Выводим фильмы##
+##Вывод результатов##
 def print_film(message, films):
     startKBoard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
     Stop = types.KeyboardButton(text='Завершить')
@@ -74,7 +74,6 @@ def print_film(message, films):
     Stop = types.KeyboardButton(text='Завершить')
     Choose = types.KeyboardButton(text='Выбрать')
     startKBoardLast.add(Choose, Stop)
-
 
     if message.text == 'Дальше':
         if films['i'] < len(films['films']):
@@ -96,7 +95,7 @@ def print_film(message, films):
         film = films['films'][films['i'] - 1]
         answer = film['name'] + '. ' + film['date']
 
-        bot.send_message(message.chat.id, 'Выбран фильм: ' + answer, reply_markup=types.ReplyKeyboardRemove())
+        bot.send_message(message.chat.id, 'Выбранный фильм: ' + answer, reply_markup=types.ReplyKeyboardRemove())
 
         reviews_info = Reviews(film['name']).get_reviews_info(film['link'])
         ar_reviews = reviews_info['arReviews']
