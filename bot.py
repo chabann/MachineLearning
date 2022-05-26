@@ -54,9 +54,10 @@ def search_film(message):
         else:
             startKBoard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
             Next = types.KeyboardButton(text='Дальше')
+            Back = types.KeyboardButton(text='Назад')
             Choose = types.KeyboardButton(text='Выбрать')
             Stop = types.KeyboardButton(text='Завершить')
-            startKBoard.add(Next, Choose, Stop)
+            startKBoard.add(Next, Back, Choose, Stop)
 
             bot.send_message(message.chat.id, 'Используй кнопки, чтобы выбрать нужный фильм',
                              reply_markup=startKBoard)
@@ -75,7 +76,16 @@ def print_film(message, films):
     Choose = types.KeyboardButton(text='Выбрать')
     startKBoardLast.add(Choose, Stop)
 
-    if message.text == 'Дальше':
+    if message.text == 'Назад':
+        if (films['i'] - 1 >= 0) > len(films['films']):
+            film = films['films'][films['i'] - 1]
+            answer = film['name'] + '. ' + film['date'] + '. ' + film['description']
+            sent = bot.send_message(message.chat.id, answer)
+            bot.register_next_step_handler(sent, print_film, {'films': films['films'], 'i': films['i'] -1})
+        else:
+            bot.send_message(message.chat.id, 'Это первый найденый фильм в списке')
+
+    elif message.text == 'Дальше':
         if films['i'] < len(films['films']):
             film = films['films'][films['i']]
             answer = film['name'] + '. ' + film['date'] + '. ' + film['description']
