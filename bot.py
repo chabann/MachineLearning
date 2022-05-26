@@ -77,7 +77,6 @@ def print_film(message, films):
     startKBoardLast.add(Choose, Stop)
 
     if message.text == 'Назад':
-        print(films['i'] - 1, len(films['films']))
         if films['i'] - 1 > -1:
             film = films['films'][films['i'] - 1]
             answer = film['name'] + '. ' + film['date'] + '. ' + film['description']
