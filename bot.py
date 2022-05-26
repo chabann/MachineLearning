@@ -3,16 +3,16 @@ from telebot import types
 from reviews import Reviews
 from predict_mood import get_prediction
 
-f = open('token.txt', 'r')
-token = f.read()
+# f = open('token.txt', 'r')
+token = '5317294884:AAHOidQIMVi9GE2MSi5PB0MbgMl8ddNFaJE'
 bot = telebot.TeleBot(token)
 
-
+##старт бота##
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(message.chat.id, 'Привет, введи название фильма!', reply_markup=types.ReplyKeyboardRemove())
 
-
+##остановка бота##
 @bot.message_handler(commands=['stop'])
 def stop(message):
     startKBoard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
@@ -21,7 +21,7 @@ def stop(message):
 
     bot.send_message(message.chat.id, 'Поиск окончен', reply_markup=startKBoard)
 
-
+##Инициализация поиска##
 @bot.message_handler(func=lambda message: message.text != '')
 def search_film(message):
     if message.text == 'Завершить':
@@ -64,7 +64,7 @@ def search_film(message):
             message.text = 'Дальше'
             print_film(message, {'films': ar_films, 'i': 0})
 
-
+##Выводим фильмы##
 def print_film(message, films):
     startKBoard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
     Stop = types.KeyboardButton(text='Завершить')
@@ -74,6 +74,7 @@ def print_film(message, films):
     Stop = types.KeyboardButton(text='Завершить')
     Choose = types.KeyboardButton(text='Выбрать')
     startKBoardLast.add(Choose, Stop)
+
 
     if message.text == 'Дальше':
         if films['i'] < len(films['films']):
@@ -95,12 +96,12 @@ def print_film(message, films):
         film = films['films'][films['i'] - 1]
         answer = film['name'] + '. ' + film['date']
 
-        bot.send_message(message.chat.id, 'Выбранный фильм: ' + answer, reply_markup=types.ReplyKeyboardRemove())
+        bot.send_message(message.chat.id, 'Выбран фильм: ' + answer, reply_markup=types.ReplyKeyboardRemove())
 
         reviews_info = Reviews(film['name']).get_reviews_info(film['link'])
         ar_reviews = reviews_info['arReviews']
         if not ar_reviews:
-            bot.send_message(message.chat.id, 'Данный фильм не содержит отзывов, выбери другой',
+            bot.send_message(message.chat.id, 'У данного фильма нет отзывов, выбери другой',
                              reply_markup=startKBoard)
         else:
             if len(ar_reviews) % 10 == 1:
